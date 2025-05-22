@@ -1,10 +1,14 @@
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn
+from time import sleep
+from rich.progress import Progress
 
-def criar_barra_progresso():
-    return Progress(
-        SpinnerColumn(),
-        "[progress.description]{task.description}",
-        BarColumn(),
-        "[progress.percentage]{task.percentage:>3.0f}%",
-        TextColumn("{task.completed}/{task.total}")
-    )
+def barra_progresso(total=100, tempo=0.05):
+    """
+    Exibe uma barra de progresso animada até atingir o total.
+    Por padrão, vai até 100, com 0.05 segundos entre os passos.
+    """
+    with Progress() as progress:
+        tarefa = progress.add_task("[cyan]Carregando...", total=total)
+
+        while not progress.finished:
+            progress.update(tarefa, advance=1)
+            sleep(tempo)
