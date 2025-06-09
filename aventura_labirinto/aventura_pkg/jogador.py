@@ -1,67 +1,83 @@
-# jogador.py
-
 from pynput import keyboard
 
-# Variáveis globais para posição e pontuação
-posicao_jogador = [0, 0]
+# Variáveis globais para a posição do jogador
+jogador_pos = [0, 0]  # linha, coluna
+
+# Pontuação
 pontuacao = 0
-labirinto = []
 
-def iniciar_jogador(lab):
-    global posicao_jogador, pontuacao, labirinto
-    labirinto = lab
-    posicao_jogador = encontrar_entrada()
+# Itens do labirinto
+itens = set()
+
+def iniciar_jogador(labirinto, pos_inicial=(0, 0)):
+    global jogador_pos, pontuacao, itens
+    jogador_pos = list(pos_inicial)
     pontuacao = 0
-    print(f"\nJogador iniciado na posição {posicao_jogador} com pontuação {pontuacao}")
-
-def encontrar_entrada():
+    # Encontrar todos os '*' (itens) no labirinto
     for i, linha in enumerate(labirinto):
         for j, celula in enumerate(linha):
-            if celula == 'E':
-                return [i, j]
-    return [0, 0]
+            if celula == '*':
+                itens.add((i, j))
 
-def mover():
+def imprimir_labirinto(labirinto):
+    for i, linha in enumerate(labirinto):
+        linha_str = ''
+        for j, celula in enumerate(linha):
+            if [i, j] == jogador_pos:
+                linha_str += 'P '  # P para indicar o jogador
+            else:
+                linha_str += celula + ' '
+        print(linha_str)
+    print(f'Pontuação: {pontuacao}')
+
+def mover(labirinto):
+
     def on_press(tecla):
-        global posicao_jogador
-
+        global jogador_pos, pontuacao
         try:
-            if tecla.char == 'w':
-                mover_para(-1, 0)
-            elif tecla.char == 's':
-                mover_para(1, 0)
-            elif tecla.char == 'a':
-                mover_para(0, -1)
-            elif tecla.char == 'd':
-                mover_para(0, 1)
-        except AttributeError:
-            pass  # Ignora teclas especiais
+            tecla_char = tecla.char.lower()
+            nova_pos = jogador_pos.copy()
 
-    print("Use as teclas W A S D para mover. Pressione ESC para sair.")
+            if tecla_char == 'w':
+                nova_pos[0] -= 1
+            elif tecla_char == 's':
+                nova_pos[0] += 1
+            elif tecla_char == 'a':
+                nova_pos[1] -= 1
+            elif tecla_char == 'd':
+                nova_pos[1] += 1
+            elif tecla_char == 'q':
+                # Sair do jogo
+                print("Encerrando o jogo...")
+                return False
+
+            # Verificar se a nova posição é válida
+            if 0 <= nova_pos[0] < len(labirinto) and 0 <= nova_pos[1] < len(labirinto[0]):
+                if labirinto[nova_pos[0]][nova_pos[1]] != '#':
+                    jogador_pos = nova_pos
+                    pontuar()
+                    # Limpar tela (no Windows funciona com 'cls')
+                    import os
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    print("=== Aventura no Labirinto ===")
+                    imprimir_labirinto(labirinto)
+
+                    # Verificar se chegou no final
+                    if labirinto[jogador_pos[0]][jogador_pos[1]] == 'S':
+                        print("\nParabéns, você chegou no final! 🎉")
+                        return False
+
+        except AttributeError:
+            pass  # Ignorar outras teclas (ex: SHIFT, CTRL, etc)
+
+    # Escutador de teclado
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
 
-def mover_para(dx, dy):
-    global posicao_jogador, pontuacao
-
-    nova_pos = [posicao_jogador[0] + dx, posicao_jogador[1] + dy]
-
-    # Verifica se está dentro do labirinto
-    if (0 <= nova_pos[0] < len(labirinto)) and (0 <= nova_pos[1] < len(labirinto[0])):
-        celula = labirinto[nova_pos[0]][nova_pos[1]]
-
-        if celula != '#':  # Se não for parede
-            posicao_jogador[:] = nova_pos
-            if celula == '*':
-                pontuar()
-                labirinto[nova_pos[0]][nova_pos[1]] = ' '
-            print(f"Movido para {posicao_jogador}. Pontuação: {pontuacao}")
-
-            if celula == 'S':
-                print("\nVocê venceu o jogo!")
-                exit()
-
 def pontuar():
     global pontuacao
-    pontuacao += 10
-    print(f"Item coletado! Nova pontuação: {pontuacao}")
+    pos_tuple = tuple(jogador_pos)
+    if pos_tuple in itens:
+        pontuacao += 10
+        itens.remove(pos_tuple)
+        print("Item coletado! +10 pontos")

@@ -14,7 +14,8 @@ def main():
     iniciar_jogador(lab)
 
     # Começa a movimentação
-    mover()
+    mover(lab)
+
 
 if __name__ == "__main__":
     main()
