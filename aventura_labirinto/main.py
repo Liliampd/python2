@@ -1,17 +1,20 @@
 # main.py
-import argparse
-from labirinto import jogo
+
+from aventura_pkg.labirinto import criar_labirinto, imprimir_labirinto
+from aventura_pkg.jogador import iniciar_jogador, mover
 
 def main():
-    parser = argparse.ArgumentParser(description="Jogo Aventura no Labirinto")
-    parser.add_argument('--start', action='store_true', help='Inicia o jogo')
+    print("=== Aventura no Labirinto ===\n")
 
-    args = parser.parse_args()
+    # Cria o labirinto
+    lab = criar_labirinto()
+    imprimir_labirinto(lab)
 
-    if args.start:
-        jogo.iniciar_jogo()
-    else:
-        print("Use --start para iniciar o jogo.")
+    # Inicia o jogador
+    iniciar_jogador(lab)
+
+    # Começa a movimentação
+    mover()
 
 if __name__ == "__main__":
     main()
