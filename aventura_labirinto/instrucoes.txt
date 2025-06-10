@@ -1,0 +1,8 @@
+# Instruções do Jogo 🕹️
+
+- Use as teclas **W A S D** para mover o jogador.
+- O objetivo é chegar até o ponto de chegada no labirinto.
+- Você ganha pontos ao coletar itens.
+- Evite as paredes `#`.
+
+Boa sorte e divirta-se! 🎉
