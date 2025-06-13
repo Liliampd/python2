@@ -1,83 +1,66 @@
-from pynput import keyboard
+"""
+Módulo jogador
+Responsável pelos movimentos e status do jogador no labirinto.
+"""
 
-# Variáveis globais para a posição do jogador
-jogador_pos = [0, 0]  # linha, coluna
+def criar_jogador():
+    """
+    Cria o jogador na posição inicial do labirinto.
 
-# Pontuação
-pontuacao = 0
+    Returns:
+        dict: informações do jogador (posição, pontos, etc.)
+    """
+    return {
+        "linha": 0,
+        "coluna": 0,
+        "pontos": 0,
+        "itens_coletados": 0
+    }
 
-# Itens do labirinto
-itens = set()
+def mover_jogador(jogador, direcao, labirinto):
+    """
+    Move o jogador para uma nova posição, se possível.
 
-def iniciar_jogador(labirinto, pos_inicial=(0, 0)):
-    global jogador_pos, pontuacao, itens
-    jogador_pos = list(pos_inicial)
-    pontuacao = 0
-    # Encontrar todos os '*' (itens) no labirinto
-    for i, linha in enumerate(labirinto):
-        for j, celula in enumerate(linha):
-            if celula == '*':
-                itens.add((i, j))
+    Args:
+        jogador (dict): informações do jogador
+        direcao (str): direção (W, A, S, D)
+        labirinto (list): matriz do labirinto
 
-def imprimir_labirinto(labirinto):
-    for i, linha in enumerate(labirinto):
-        linha_str = ''
-        for j, celula in enumerate(linha):
-            if [i, j] == jogador_pos:
-                linha_str += 'P '  # P para indicar o jogador
-            else:
-                linha_str += celula + ' '
-        print(linha_str)
-    print(f'Pontuação: {pontuacao}')
+    Returns:
+        bool: True se o jogador venceu o jogo, False caso contrário
+    """
+    movimentos = {
+        "W": (-1, 0),
+        "A": (0, -1),
+        "S": (1, 0),
+        "D": (0, 1)
+    }
 
-def mover(labirinto):
+    direcao = direcao.upper()
+    if direcao not in movimentos:
+        return False
 
-    def on_press(tecla):
-        global jogador_pos, pontuacao
-        try:
-            tecla_char = tecla.char.lower()
-            nova_pos = jogador_pos.copy()
+    delta_linha, delta_coluna = movimentos[direcao]
+    nova_linha = jogador["linha"] + delta_linha
+    nova_coluna = jogador["coluna"] + delta_coluna
 
-            if tecla_char == 'w':
-                nova_pos[0] -= 1
-            elif tecla_char == 's':
-                nova_pos[0] += 1
-            elif tecla_char == 'a':
-                nova_pos[1] -= 1
-            elif tecla_char == 'd':
-                nova_pos[1] += 1
-            elif tecla_char == 'q':
-                # Sair do jogo
-                print("Encerrando o jogo...")
-                return False
+    # Verificar se está dentro dos limites do labirinto
+    if 0 <= nova_linha < len(labirinto) and 0 <= nova_coluna < len(labirinto[0]):
+        destino = labirinto[nova_linha][nova_coluna]
 
-            # Verificar se a nova posição é válida
-            if 0 <= nova_pos[0] < len(labirinto) and 0 <= nova_pos[1] < len(labirinto[0]):
-                if labirinto[nova_pos[0]][nova_pos[1]] != '#':
-                    jogador_pos = nova_pos
-                    pontuar()
-                    # Limpar tela (no Windows funciona com 'cls')
-                    import os
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    print("=== Aventura no Labirinto ===")
-                    imprimir_labirinto(labirinto)
+        if destino == "#":
+            return False  # Bateu na parede
 
-                    # Verificar se chegou no final
-                    if labirinto[jogador_pos[0]][jogador_pos[1]] == 'S':
-                        print("\nParabéns, você chegou no final! 🎉")
-                        return False
+        if destino == "*":
+            jogador["pontos"] += 10
+            jogador["itens_coletados"] += 1
 
-        except AttributeError:
-            pass  # Ignorar outras teclas (ex: SHIFT, CTRL, etc)
+        # Atualizar posição
+        jogador["linha"] = nova_linha
+        jogador["coluna"] = nova_coluna
 
-    # Escutador de teclado
-    with keyboard.Listener(on_press=on_press) as listener:
-        listener.join()
+        # Verificar se chegou ao final
+        if destino == "E":
+            return True  # Vitória
 
-def pontuar():
-    global pontuacao
-    pos_tuple = tuple(jogador_pos)
-    if pos_tuple in itens:
-        pontuacao += 10
-        itens.remove(pos_tuple)
-        print("Item coletado! +10 pontos")
+    return False

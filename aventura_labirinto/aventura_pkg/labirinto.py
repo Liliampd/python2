@@ -1,11 +1,13 @@
-# aventura_pkg/labirinto.py
-
 """
 Módulo labirinto
 Contém funções para criação e impressão do labirinto.
 """
 
 import random
+from rich.console import Console
+from rich.table import Table
+
+console = Console()
 
 def criar_labirinto(linhas=10, colunas=10, qtd_itens=5):
     """
@@ -37,18 +39,40 @@ def criar_labirinto(linhas=10, colunas=10, qtd_itens=5):
                 labirinto[i][j] = '*'
                 break
 
-    # Definir posição de entrada (E) e saída (S)
-    labirinto[0][0] = 'E'
-    labirinto[linhas-1][colunas-1] = 'S'
+    # Definir posição de entrada (S) e saída (E)
+    labirinto[0][0] = 'S'  # Início
+    labirinto[linhas-1][colunas-1] = 'E'  # Fim
 
     return labirinto
 
-def imprimir_labirinto(labirinto):
+def imprimir_labirinto(labirinto, jogador_posicao=None):
     """
-    Imprime o labirinto na tela.
+    Imprime o labirinto na tela com destaque para jogador, obstáculos e itens.
 
     Args:
         labirinto (list): matriz representando o labirinto
+        jogador_posicao (tuple): posição (linha, coluna) do jogador (opcional)
     """
-    for linha in labirinto:
-        print(' '.join(linha))
+    tabela = Table(show_header=False, box=None, padding=(0, 1))
+
+    for _ in range(len(labirinto[0])):
+        tabela.add_column()
+
+    for i, linha in enumerate(labirinto):
+        nova_linha = []
+        for j, celula in enumerate(linha):
+            if jogador_posicao == (i, j):
+                nova_linha.append("[bold green]@[/]")  # jogador
+            elif celula == "#":
+                nova_linha.append("[red]#[/]")
+            elif celula == "*":
+                nova_linha.append("[yellow]*[/]")
+            elif celula == "S":
+                nova_linha.append("[cyan]S[/]")
+            elif celula == "E":
+                nova_linha.append("[cyan]E[/]")
+            else:
+                nova_linha.append(" ")
+        tabela.add_row(*nova_linha)
+
+    console.print(tabela)

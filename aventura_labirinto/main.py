@@ -1,58 +1,49 @@
 import argparse
 from rich.console import Console
-from aventura_pkg.jogador import Jogador
-from aventura_pkg.labirinto import Labirinto
-from aventura_pkg.utils import imprime_instrucoes
-from aventura_pkg.menu import exibir_menu
+from rich.panel import Panel
+from rich.text import Text
 
-console = Console()
+from aventura_pkg.labirinto import criar_labirinto, imprimir_labirinto
+from aventura_pkg.jogador import criar_jogador, mover_jogador
+from aventura_pkg.utils import imprime_instrucoes
+from aventura_pkg.painel import exibir_painel_jogo
 
 def main():
-    # Menu inicial
-    acao = exibir_menu()
-
-    if acao == "instrucoes":
-        imprime_instrucoes()
-        return
-    elif acao == "sair":
-        console.print("[bold magenta]Até a próxima! 👋[/bold magenta]")
-        return
-
-    # Argumentos da linha de comando
-    parser = argparse.ArgumentParser(description="Jogo de Aventura no Labirinto")
-
-    parser.add_argument("--name", type=str, help="Nome do jogador")
-    parser.add_argument("--color", type=str, help="Cor favorita do jogador")
-    parser.add_argument("--dificuldade", type=str, choices=["facil", "medio", "dificil"], default="facil", help="Nível de dificuldade")
+    parser = argparse.ArgumentParser(description="Jogo: Aventura no Labirinto!")
+    parser.add_argument("--name", required=True, help="Nome do jogador")
+    parser.add_argument("--color", default="cyan", help="Cor preferida do jogador")
+    parser.add_argument("--dificuldade", default="facil", choices=["facil", "medio", "dificil"], help="Nível de dificuldade")
+    parser.add_argument("--help", action="store_true", help="Exibe as instruções do jogo")
 
     args = parser.parse_args()
 
-    nome = args.name if args.name else "Aventureiro(a)"
-    cor = args.color if args.color else "azul"
-    dificuldade = args.dificuldade
+    console = Console()
 
-    console.print(f"[bold yellow]Jogador:[/bold yellow] {nome}, [bold yellow]Cor:[/bold yellow] {cor}, [bold yellow]Dificuldade:[/bold yellow] {dificuldade}")
+    if args.help:
+        imprime_instrucoes()
+        return
 
-    # Criar jogador e labirinto
-    jogador = Jogador(nome, cor)
-    labirinto = Labirinto(dificuldade)
+    # Define quantidade de itens com base na dificuldade
+    if args.dificuldade == "facil":
+        qtd_itens = 3
+    elif args.dificuldade == "medio":
+        qtd_itens = 5
+    else:
+        qtd_itens = 8
 
-    # Exibir labirinto inicial
-    labirinto.exibir(jogador)
+    # Cria labirinto e jogador
+    labirinto = criar_labirinto(qtd_itens=qtd_itens)
+    jogador = criar_jogador()
 
-    # Loop de jogo (simples por enquanto)
-    while True:
-        comando = input("Digite um comando (W/A/S/D para mover ou Q para sair): ").lower()
+    venceu = False
+    while not venceu:
+        console.clear()
+        exibir_painel_jogo(jogador, args.name, args.color, args.dificuldade)
+        imprimir_labirinto(labirinto)
+        direcao = console.input("\nDigite a direção (W/A/S/D): ")
+        venceu = mover_jogador(jogador, direcao, labirinto)
 
-        if comando == "q":
-            console.print("[bold red]Saindo do jogo...[/bold red] 👋")
-            break
-
-        if comando in ["w", "a", "s", "d"]:
-            jogador.mover(comando, labirinto)
-            labirinto.exibir(jogador)
-        else:
-            console.print("[red]Comando inválido. Use W, A, S, D ou Q.[/red]")
+    console.print("\n🎉 Parabéns, você venceu o labirinto! 🎉", style="bold green")
 
 if __name__ == "__main__":
     main()
