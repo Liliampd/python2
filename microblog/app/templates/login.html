@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Login</h2>
+
+  <form method="post" action="{{ url_for('login') }}" style="max-width:420px;">
+    <label>Usuário</label><br/>
+    <input type="text" name="username" required style="width:100%; padding:8px; margin:6px 0 12px;"/>
+
+    <label>Senha</label><br/>
+    <input type="password" name="password" required style="width:100%; padding:8px; margin:6px 0 12px;"/>
+
+    <label style="display:inline-flex; align-items:center; gap:6px; margin:6px 0 16px;">
+      <input type="checkbox" name="remember" value="1"/>
+      Permanecer logada (remember me)
+    </label>
+    <br/>
+
+    <button type="submit" class="btn btn-blue">Entrar</button>
+    <a href="{{ url_for('index') }}" class="btn" style="margin-left:6px;">Cancelar</a>
+  </form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Novo post</h2>
+
+  <form method="post" action="{{ url_for('novo_post') }}" style="max-width:720px;">
+    <textarea name="body" rows="6" placeholder="Escreva seu post aqui..."
+              required
+              style="width:100%; padding:10px; margin:6px 0 14px;"></textarea>
+
+    <button type="submit" class="btn btn-green">Publicar</button>
+    <a href="{{ url_for('index') }}" class="btn" style="margin-left:6px;">Cancelar</a>
+  </form>
+{% endblock %}

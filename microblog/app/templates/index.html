@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Bem-vinda ao Microblog</h1>
+
+  {% if user %}
+    <p>Você está logada como <strong>{{ user.username }}</strong>.</p>
+    <p><a href="{{ url_for('novo_post') }}" class="btn btn-green">✍️ Novo post</a></p>
+  {% else %}
+    <p>Você ainda não está logada.</p>
+  {% endif %}
+
+  <hr/>
+
+  <h3>Timeline</h3>
+
+  {% if posts and posts|length > 0 %}
+    <ul style="list-style:none; padding-left:0; margin:0;">
+      {% for p in posts %}
+        <li class="post">
+          <div class="post-header">
+            <strong>@{{ p.author.username }}</strong> — {{ p.created_at.strftime('%d/%m/%Y %H:%M') }}
+          </div>
+
+          <div class="post-body">
+            {{ p.body }}
+          </div>
+
+          {% if current_user.is_authenticated and p.user_id == current_user.id %}
+            <div class="post-actions">
+              <a href="{{ url_for('editar_post', post_id=p.id) }}" class="btn btn-blue">✏️ Editar</a>
+              <form method="post"
+                    action="{{ url_for('excluir_post', post_id=p.id) }}"
+                    style="display:inline;"
+                    onsubmit="return confirm('Tem certeza que deseja excluir este post?');">
+                <button type="submit" class="btn btn-red">🗑️ Excluir</button>
+              </form>
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Sem posts ainda.</p>
+  {% endif %}
+{% endblock %}

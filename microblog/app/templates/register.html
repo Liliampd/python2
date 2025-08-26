@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Registrar</h2>
+
+  <form method="post" action="{{ url_for('register') }}" style="max-width:420px;">
+    <label>Usuário</label><br/>
+    <input type="text" name="username" required style="width:100%; padding:8px; margin:6px 0 12px;"/>
+
+    <label>Senha</label><br/>
+    <input type="password" name="password" required style="width:100%; padding:8px; margin:6px 0 12px;"/>
+
+    <label>Confirmar senha</label><br/>
+    <input type="password" name="confirm" required style="width:100%; padding:8px; margin:6px 0 16px;"/>
+
+    <button type="submit" class="btn btn-green">Criar conta</button>
+    <a href="{{ url_for('login') }}" class="btn" style="margin-left:6px;">Já tenho conta</a>
+  </form>
+{% endblock %}

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <title>Microblog</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f8f9fa;
+        color: #333;
+      }
+
+      h1, h2, h3 {
+        color: #222;
+      }
+
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      /* Botões gerais */
+      .btn {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .btn-green {
+        background: #28a745;
+        color: #fff;
+      }
+      .btn-green:hover {
+        background: #218838;
+      }
+
+      .btn-blue {
+        background: #007bff;
+        color: #fff;
+      }
+      .btn-blue:hover {
+        background: #0069d9;
+      }
+
+      .btn-red {
+        background: #dc3545;
+        color: #fff;
+        border: none;
+      }
+      .btn-red:hover {
+        background: #c82333;
+      }
+
+      /* Caixa de post */
+      .post {
+        margin: 14px 0;
+        padding: 12px 14px;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .post-header {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 6px;
+      }
+
+      .post-body {
+        font-size: 16px;
+        line-height: 1.4;
+        white-space: pre-wrap;
+      }
+
+      .post-actions {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+   <div>
+  <a href="{{ url_for('index') }}">Home</a>
+  {% if current_user.is_authenticated %}
+    | <a href="{{ url_for('perfil') }}">Meu perfil</a>
+    | <a href="{{ url_for('logout') }}">Logout</a>
+  {% else %}
+    | <a href="{{ url_for('login') }}">Login</a>
+    | <a href="{{ url_for('register') }}">Registrar</a>
+  {% endif %}
+</div>
+
+    <hr/>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li style="color: {% if category == 'error' %}red{% elif category == 'success' %}green{% else %}black{% endif %};">
+              {{ message }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </body>
+</html>
